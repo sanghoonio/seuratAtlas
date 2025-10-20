@@ -24,7 +24,7 @@ You can install the development version of seuratAtlas from GitHub:
 
 ```{r install, eval = FALSE}
 # install.packages("devtools")
-devtools::install_github("sanghoonio/seuratAtlas" subdir = "api")
+devtools::install_github("sanghoonio/seuratAtlas", subdir = "api")
 ```
 
 ## Required Packages

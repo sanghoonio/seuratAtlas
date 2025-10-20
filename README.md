@@ -1,4 +1,4 @@
-## seuratAtlas
+## Seurat Atlas
 
 Interactive visualizations for Seurat single-cell analyses, through Apple's [Embedding Atlas](https://github.com/apple/embedding-atlas).
 
