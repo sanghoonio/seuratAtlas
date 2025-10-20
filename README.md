@@ -1,14 +1,14 @@
 ## seuratAtlas
 
-Interactive web-based visualizations for Seurat single-cell RNA-seq analysis results, using Apple's [Embedding Atlas](https://github.com/apple/embedding-atlas).
+Interactive visualizations for Seurat single-cell analyses, through Apple's [Embedding Atlas](https://github.com/apple/embedding-atlas).
 
 ### Overview
 
-`seuratAtlas` provides an interactive viewer for exploring Seurat objects through a web interface. The package launches a local web server that displays UMAP embeddings and metadata with real-time querying capabilities.
+`seuratAtlas` provides an interactive web interface for exploring Seurat objects. The package launches a local web server that displays Seurat embeddings and metadata with real-time querying capabilities and interactions.
 
 ### Installation
 
-You can install the development version from GitHub:
+Install the development version from GitHub:
 
 ``` r
 # install.packages("devtools")
@@ -24,7 +24,7 @@ library(seuratAtlas)
 # process your Seurat object with UMAP
 pbmc <- RunUMAP(pbmc, dims = 1:10)
 
-# launch the interactive viewer
+# launch the embedding atlas
 seurat_atlas(pbmc)
 ```
 
@@ -36,22 +36,15 @@ This will:
 ### Features
 
 - **Interactive UMAP visualization**: Pan, zoom, and select cells
-- **Real-time querying**: Fast SQL-based data filtering
-- **Metadata exploration**: Visualize different metadata columns
-- **WebSocket communication**: Responsive data updates
+- **Real-time querying**: Fast SQL-based data filtering with websocket
+- **Metadata exploration**: Query metadata columns with dynamic selections
 
 ## Documentation
 
-See the package vignette for a detailed tutorial:
+View the package vignette for a detailed tutorial:
 
 ``` r
 vignette("pbmc-tutorial", package = "seuratAtlas")
-```
-
-Or view the function documentation:
-
-``` r
-?seurat_atlas
 ```
 
 ## Building the UI
