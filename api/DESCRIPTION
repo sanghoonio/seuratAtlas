@@ -1,0 +1,30 @@
+Package: seuratAtlas
+Type: Package
+Title: Interactive Web-Based Visualization for Seurat Objects
+Version: 0.1.0
+Author: Sam Park
+Maintainer: Sam Park
+Description: Provides an interactive web-based viewer for exploring Seurat
+    single-cell RNA-seq analysis results. The package launches a local web
+    server that displays UMAP embeddings and metadata in an interactive
+    interface with real-time querying capabilities, powered by Apple's
+    Embedding Atlas.
+License: MIT + file LICENSE
+Encoding: UTF-8
+LazyData: true
+RoxygenNote: 7.3.2
+Depends: R (>= 4.0.0)
+Imports:
+    arrow,
+    cachem,
+    DBI,
+    digest,
+    duckdb,
+    httpuv,
+    jsonlite,
+    Seurat
+Suggests:
+    knitr,
+    rmarkdown,
+    presto
+VignetteBuilder: knitr

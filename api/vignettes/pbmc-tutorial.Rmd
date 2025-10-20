@@ -1,0 +1,170 @@
+---
+title: "pbmc-tutorial"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{pbmc-tutorial}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+## Introduction
+
+The `seuratAtlas` package provides an interactive web-based visualization tool for exploring Seurat single-cell RNA-seq analysis results. This vignette demonstrates how to prepare a Seurat object and launch the interactive atlas viewer.
+
+## Installation
+
+You can install the development version of seuratAtlas from GitHub:
+
+```{r install, eval = FALSE}
+# install.packages("devtools")
+devtools::install_github("sanghoonio/seuratAtlas" subdir = "api")
+```
+
+## Required Packages
+
+This tutorial requires the following packages:
+
+```{r packages}
+library(Seurat)
+library(presto)
+library(seuratAtlas)
+```
+
+## Loading Data
+
+For this tutorial, we'll use the PBMC (Peripheral Blood Mononuclear Cells) dataset included with the package:
+
+```{r load-data}
+data(pbmc, package = "seuratAtlas")
+```
+
+## Quality Control
+
+First, calculate the percentage of mitochondrial genes to assess cell quality:
+
+```{r qc}
+pbmc[["percent.mt"]] <- PercentageFeatureSet(pbmc, pattern = "^MT-")
+```
+
+## Data Normalization
+
+Normalize the data using log normalization with a scale factor of 10,000:
+
+```{r normalize}
+pbmc <- NormalizeData(pbmc, normalization.method = "LogNormalize", scale.factor = 1e4)
+```
+
+## Feature Selection
+
+Identify highly variable features that will be used for downstream analysis:
+
+```{r variable-features}
+pbmc <- FindVariableFeatures(pbmc, selection.method = 'vst', nfeatures = 2000)
+
+# Get top 100 variable features and include mitochondrial genes
+var_features <- VariableFeatures(pbmc)[1:100]
+var_features <- unique(c(
+  var_features,
+  rownames(GetAssayData(pbmc))[grepl('^MT-', rownames(GetAssayData(pbmc)))]
+))
+```
+
+## Data Scaling
+
+Scale the data and regress out the effect of mitochondrial gene expression:
+
+```{r scale}
+all.genes <- rownames(pbmc)
+pbmc <- ScaleData(pbmc, features = all.genes)
+pbmc <- ScaleData(pbmc, vars.to.regress = 'percent.mt')
+```
+
+## Dimensionality Reduction
+
+### PCA
+
+Run Principal Component Analysis:
+
+```{r pca}
+pbmc <- RunPCA(pbmc, features = VariableFeatures(object = pbmc))
+```
+
+### Determine Optimal Number of PCs
+
+Use an automated approach to determine the optimal number of principal components:
+
+```{r determine-pcs}
+# Calculate variance explained by each PC
+pct <- pbmc[["pca"]]@stdev / sum(pbmc[["pca"]]@stdev) * 100
+cumu <- cumsum(pct)
+
+# Determine elbow using two methods:
+# Method 1: PC that explains >90% cumulative variance and <5% individual variance
+co1 <- which(cumu > 90 & pct < 5)[1]
+
+# Method 2: PC where the change in variance explained drops below 0.1%
+co2 <- sort(which((pct[1:length(pct) - 1] - pct[2:length(pct)]) > 0.1), decreasing = TRUE)[1] + 1
+
+# Take minimum of the two methods
+pcs <- min(co1, co2, na.rm = TRUE)
+
+print(paste("Using", pcs, "principal components"))
+```
+
+## Clustering
+
+Find neighbors and identify clusters:
+
+```{r clustering}
+pbmc <- FindNeighbors(pbmc, dims = 1:pcs)
+pbmc <- FindClusters(pbmc, resolution = 0.5)
+```
+
+## UMAP
+
+Run UMAP for visualization:
+
+```{r umap}
+pbmc <- RunUMAP(pbmc, dims = 1:pcs)
+```
+
+## Cluster Annotation
+
+Assign cell type labels to the identified clusters:
+
+```{r annotate}
+new.cluster.ids <- c(
+  "Naive CD4 T",
+  "CD14+ Mono",
+  "Memory CD4 T",
+  "B",
+  "CD8 T",
+  "FCGR3A+ Mono",
+  "NK",
+  "DC",
+  "Platelet"
+)
+names(new.cluster.ids) <- levels(pbmc)
+pbmc <- RenameIdents(pbmc, new.cluster.ids)
+```
+
+## Launch Interactive Atlas
+
+Finally, launch the interactive seuratAtlas viewer:
+
+```{r launch-atlas, eval = FALSE}
+seurat_atlas(pbmc)
+```
+
+This will:
+
+1. Start a local web server on `http://localhost:3000`
+2. Automatically open your default web browser
+3. Display an interactive interface where you can explore your data
