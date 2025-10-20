@@ -125,6 +125,9 @@ Find neighbors and identify clusters:
 ```{r clustering}
 pbmc <- FindNeighbors(pbmc, dims = 1:pcs)
 pbmc <- FindClusters(pbmc, resolution = 0.5)
+
+# Add PCA cluster as metadata column
+pbmc$pca_clusters <- as.character(Idents(pbmc))
 ```
 
 ## UMAP
@@ -153,18 +156,15 @@ new.cluster.ids <- c(
 )
 names(new.cluster.ids) <- levels(pbmc)
 pbmc <- RenameIdents(pbmc, new.cluster.ids)
+
+# Add cell type as metadata column
+pbmc$cell_type <- as.character(Idents(pbmc))
 ```
 
 ## Launch Interactive Atlas
 
-Finally, launch the interactive seuratAtlas viewer:
+Finally, launch the Embedding Atlas:
 
 ```{r launch-atlas, eval = FALSE}
 seurat_atlas(pbmc)
 ```
-
-This will:
-
-1. Start a local web server on `http://localhost:3000`
-2. Automatically open your default web browser
-3. Display an interactive interface where you can explore your data
