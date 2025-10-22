@@ -33,6 +33,8 @@ This will:
 2. Automatically open your default browser
 3. Display an interactive interface for exploring your data
 
+<img width="3024" height="1890" alt="atlas" src="https://github.com/user-attachments/assets/37e82859-d8b8-4310-a972-d4eb664bc52f" />
+
 ### Features
 
 - **Interactive UMAP visualization**: Pan, zoom, and select cells
